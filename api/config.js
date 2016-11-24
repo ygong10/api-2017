@@ -51,6 +51,7 @@ config.database.primary = { pool: {} };
 config.mail = {};
 config.storage = {};
 config.superuser = {};
+config.github = { client: {} };
 config.token = { expiration: {} };
 
 config.isDevelopment = isDevelopment;
@@ -64,6 +65,9 @@ config.superuser.password = superuserPassword;
 config.auth.secret = config.secret;
 config.auth.header = 'Authorization';
 config.auth.expiration = '7d';
+
+config.github.client.id = process.env.GITHUB_CLIENT_ID;
+config.github.client.secret = process.env.GITHUB_CLIENT_SECRET;
 
 config.token.expiration.DEFAULT = '7d';
 config.token.expiration.AUTH = config.token.expiration.DEFAULT;
