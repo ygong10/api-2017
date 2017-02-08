@@ -1,4 +1,6 @@
 module.exports = {
+	AddLocationToEventsRequest: require('./AddLocationToEventsRequest'),
+	AddEventToLocationsRequest: require('./AddEventToLocationsRequest'),
         AttendeeRequest: require('./AttendeeRequest'),
         AttendeeDecisionRequest: require('./AttendeeDecisionRequest'),
         AccreditedUserCreationRequest: require('./AccreditedUserCreationRequest'),

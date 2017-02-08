@@ -19,13 +19,23 @@ var utils = require('../utils');
  * @param  {[Location]}     locations       Array of Location objects. Containing three parameters:
  *                                              name:      name of the location,
  *                                              latitude:  latitude of the location,
- *                                              longitude: longitude of the location,
+ *                                              longitude: longitude of the location
  */
 module.exports.createEvent = function (name, description, qr_code, time, locations) {
+	var event_obj = null;
         return Event.create(name, description, qr_code, time, locations)
                 .then(function(result) {
-                        return _Promise.resolve(result);
-                });
+			event_obj = result;
+			return _Promise.map(locations, function(location) {
+				return Location.addLocation(location.name,
+							    location.latitude,
+							    location.longitude);
+			});
+                })
+		.then(function (result) {
+			event_obj.attributes.locations = result;
+			return event_obj;
+		});
 };
 
 module.exports.findByUpdated = function (unix_timestamp) {
@@ -46,7 +56,25 @@ module.exports.createLocation = function (name, latitude, longitude) {
 };
 
 module.exports.getLocations = function () {
-	return Location.fetchAll();
+        return Location.fetchAll();
+};
+
+module.exports.addLocationToEvents = function (event_ids, location_id) {
+        return Location_Event.addRecords([location_id], event_ids)
+                .then(function (result) {
+                        return _Promise.map(event_ids, function (event_id) {
+                                return Event.where({ id: event_id }).fetch();
+                        });
+                });
+};
+
+module.exports.addEventToLocations = function (event_id, location_ids) {
+        return Location_Event.addRecords([event_id], location_ids)
+                .then(function (result) {
+                        return _Promise.map(location_ids, function (location_id) {
+                                return Location.where({ id: location_id }).fetch();
+                        });
+                });
 };
 
 // /**

@@ -31,14 +31,13 @@ var Location = Model.extend({
  * @returns {Promise<Location>} the result of the addititon
  */
 Location.addLocation = function(name, latitude, longitude) {
-	console.log(name, latitude, longitude);
         var location = Location.forge({
                 name: name,
                 latitude: latitude,
                 longitude: longitude
         });
 
-	return _Promise.resolve(location);
+	return location.save();
 };
 
 /**

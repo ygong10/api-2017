@@ -66,14 +66,7 @@ Event.create = function (name, description, qr_code, time, locations) {
                 return event.save();
         }
 
-	return event.save()
-                .then(function(result) {
-			event = result;
-                        return Location.addLocations(event, locations);
-                })
-		.then(function (result) {
-			return Event.findById(event.get('id'));
-		});
+	return event.save();
 };
 
 Event.prototype.serialize = function () {

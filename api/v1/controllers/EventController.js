@@ -66,6 +66,19 @@ function getLocations(req, res, next) {
                 });
 }
 
+function addLocationToEvents(req, res, next) {
+        return services.EventService.addLocationToEvents(req.body.event_ids,
+                                                         req.body.location_id)
+                .then(function (result) {
+                        console.log(result);
+                });
+}
+
+function addEventToLocations(req, res, next) {
+        return services.EventService.addEventToLocations(req.body.event_id,
+                                                         req.body.location_ids);
+}
+
 
 router.use(bodyParser.json());
 
@@ -75,16 +88,16 @@ router.post('/create', middleware.auth,
             middleware.permission(roles.ORGANIZERS), // Change to SUPERUSER?
             middleware.request(requests.EventCreationRequest),
             createEvent);
-router.post('/location', middleware.auth,
+router.post('/locations', middleware.auth,
             middleware.permission(roles.ORGANIZERS), // Change to SUPERUSER?
             middleware.request(requests.LocationCreationRequest),
             createLocation);
-
-// router.post('/', middleware.request(requests.BasicAuthRequest), createUser);
-// router.post('/accredited', middleware.request(requests.AccreditedUserCreationRequest),
-//      middleware.permission(roles.ORGANIZERS), createAccreditedUser);
-// router.post('/reset', middleware.request(requests.ResetTokenRequest), requestPasswordReset);
-// router.get('/:id', middleware.permission(roles.ORGANIZERS, isRequester), getUser);
+router.post('/addLocation', middleware.auth,
+            middleware.permission(roles.ORGANIZERS), // Change to SUPERUSER?
+            addLocationToEvents);
+router.post('/locations/addEvent', middleware.auth,
+            middleware.permission(roles.ORGANIZERS), // Change to SUPERUSER?
+            addEventToLocations);
 
 router.use(middleware.response);
 router.use(middleware.errors);
