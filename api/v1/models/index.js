@@ -6,6 +6,8 @@ module.exports = {
 	AttendeeRequestedCollaborator: require('./AttendeeRequestedCollaborator'),
 	Project: require('./Project'),
 	Ecosystem: require('./Ecosystem'),
+	Event: require('./Event'),
+	Location: require('./Location'),
 	MailingList: require('./MailingList'),
 	MailingListUser: require('./MailingListUser'),
 	User: require('./User'),
