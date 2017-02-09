@@ -17,17 +17,13 @@ var logger = require('../../logging');
 var router = require('express').Router();
 
 function getEvents(req, res, next) {
-        if (!req.query.last_updated) {
-                return services.EventService.findByUpdated(0)
-                        .then(function(result) {
-                                res.body = result.length == 0 ? [] : result.toJSON();
-                                next();
-                                return null;
-                        });
-        }
-        return services.EventService.findByUpdated(req.query.last_updated)
+	var updated = req.query.last_updated || 0;
+        return services.EventService.findByUpdated(updated)
                 .then(function(result) {
-                        res.body = result.length == 0 ? [] : result.toJSON();
+                        console.log(result);
+                        res.body = result.length == 0 ? [] : result.map(function (obj) {
+				return obj.toJSON();
+			});
                         next();
                         return null;
                 });
@@ -35,9 +31,11 @@ function getEvents(req, res, next) {
 
 function createEvent(req, res, next) {
         return services.EventService.createEvent(req.body.name,
+						 req.body.short_name,
                                                  req.body.description,
                                                  req.body.qr_code,
-                                                 req.body.time,
+						 req.body.start_time,
+						 req.body.end_time,
                                                  req.body.locations)
                 .then(function(result) {
                         res.body = result.toJSON();
@@ -48,6 +46,7 @@ function createEvent(req, res, next) {
 
 function createLocation(req, res, next) {
         return services.EventService.createLocation(req.body.name,
+						    req.body.short_name,
                                                     req.body.latitude,
                                                     req.body.longitude)
                 .then(function (result) {

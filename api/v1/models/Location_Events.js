@@ -27,11 +27,28 @@ Location_Events.addRecords = function (locations, events) {
                 }
         }
 
-	console.log(records);
+        return Location_Events.transaction(function (t) {
+                return _Promise.map(records, function(model) {
+                        return Location_Events.forge(model).save(null, {transacting: t});
+                });
+        });
+};
+
+Location_Events.addRecordModels = function (locations, events) {
+        var records = new Array(locations.length*events.length);
+
+        for (var i = 0; i < locations.length; i++) {
+                for (var j = 0; j < events.length; j++) {
+                        records[i*events.length+j] = {
+                                event_id: events[j].get('id'),
+                                location_id: locations[i].get('id')
+                        };
+                }
+        }
 
         return Location_Events.transaction(function (t) {
                 return _Promise.map(records, function(model) {
-                        return Location_Events.forge(model).save(null, t);
+                        return Location_Events.forge(model).save(null, {transacting: t});
                 });
         });
 };

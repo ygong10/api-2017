@@ -1,5 +1,4 @@
 /* jshint esversion 6 */
-
 var _Promise = require('bluebird');
 var _ = require('lodash');
 var moment = require('moment');
@@ -12,10 +11,12 @@ var Event = Model.extend({
         idAttribute: 'id',
         hasTimestamps: ['created', 'updated'],
         validations: {
-                name: ['required', 'string', 'maxLength:25'],
-                time: ['required'],
-                description: ['required', 'string'],
-                qr_code: ['required', 'boolean']
+                name: ['required', 'string', 'maxLength:255'],
+                short_name: ['required', 'string', 'maxLength:25'],
+                description: ['required', 'string', 'maxLength:2047'],
+                qr_code: ['required', 'boolean'],
+                start_time: ['required', 'date'],
+                end_time: ['required', 'date']
         },
 
         location_events: function () {
@@ -29,7 +30,7 @@ var Event = Model.extend({
  * @return {Promise<Model>}     a Promise resolving to the resulting model or null
  */
 Event.findById = function(id) {
-        return Event.where({ id: id }).fetchAll({ withRelated: ['locations'] });
+        return Event.where({ id: id });
 };
 
 
@@ -40,37 +41,47 @@ Event.findById = function(id) {
  */
 Event.findByUpdated = function(unix_timestamp) {
         return Event.where('updated', '>=', moment.unix(unix_timestamp).toDate())
-                .fetchAll({ withRelated: ['locations'] });
+		.fetchAll();
 };
 
 /**
  * Creates a new event and locations with the specified parameters. Validation is performed on-save only
  * @param  {String}         name            The event's name
+ * @param  {String}         short_name            The event's name
  * @param  {String}         description     The event's description
  * @param  {Number|Boolean} qr_code         Whether the event needs a QR code or not
- * @param  {Number}         time            Time at which the event takes place
+ * @param  {Number}         start_time      Time at which the event takes place
+ * @param  {Number}         end_time            Time at which the event takes place
  * @param  {[Location]}     locations       Array of Location objects. Containing three parameters:
  *                                                   name:      name of the location,
  *                                                   latitude:  latitude of the location,
  *                                                   longitude: longitude of the location,
  */
-Event.create = function (name, description, qr_code, time, locations) {
+Event.create = function (name, short_name,
+			 description, qr_code,
+			 start_time, end_time, locations) {
         var event = Event.forge({
                 name: name,
+		short_name: short_name,
                 description: description,
                 qr_code: qr_code != 0,
-                time: moment.unix(time).toDate()
+		start_time: moment.unix(start_time).toDate(),
+		end_time: moment.unix(end_time).toDate()
         });
 
         if (!locations || locations.length == 0) {
                 return event.save();
         }
 
-	return event.save();
+        return event.save();
 };
 
 Event.prototype.serialize = function () {
-        return _.omit(this.attributes, ['created']);
+        var ret = _.omit(this.attributes, ['created']);
+	ret.start_time	= ret.startTime.getTime() / 1000.0;
+	ret.end_time	= ret.endTime.getTime() / 1000.0;
+	ret.updated	= ret.updated.getTime() / 1000.0;
+	return ret;
 };
 
 module.exports = Event;

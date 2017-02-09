@@ -1,11 +1,15 @@
 var Request = require('./Request');
 
-var bodyRequired = ['time', 'name', 'qr_code', 'description'];
+var bodyRequired = ['name', 'short_name', 'qr_code',
+		    'description', 'start_time', 'end_time'];
+
 var bodyValidations = {
-        'time'		: ['number'],
-        'name'		: ['string', 'maxLength:25'],
+	'short_name'    : ['string', 'maxLength:25'],
+        'name'		: ['string', 'maxLength:255'],
         'qr_code'	: ['natural'],
-        'description'	: ['string', 'maxLength:2048']
+        'description'	: ['string', 'maxLength:2047'],
+        'start_time'    : ['number'],
+        'end_time'      : ['number']
 };
 
 var bodyAllowed = ['locations'];

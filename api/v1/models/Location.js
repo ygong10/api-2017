@@ -9,7 +9,8 @@ var Location = Model.extend({
         tableName: 'locations',
         idAttribute: 'id',
         validations: {
-                name: ['required', 'string', 'maxLength:25'],
+                name: ['required', 'string', 'maxLength:255'],
+                short_name: ['required', 'string', 'maxLength:25'],
                 latitude: ['required', 'number'],
                 longitude: ['required', 'number']
         },
@@ -30,9 +31,10 @@ var Location = Model.extend({
  * @param {Transaction} t       pending transaction (optional)
  * @returns {Promise<Location>} the result of the addititon
  */
-Location.addLocation = function(name, latitude, longitude) {
+Location.addLocation = function(name, short_name, latitude, longitude) {
         var location = Location.forge({
                 name: name,
+		short_name: short_name,
                 latitude: latitude,
                 longitude: longitude
         });
@@ -49,13 +51,13 @@ Location.findById = function(id) {
         return Location.where({ id: id }).fetch();
 };
 
-/**
- * Finds a Location by its event ID.
- * @param  {Number|String} id   the ID of the model with the appropriate type
- * @return {Promise<Model>}             a Promise resolving to the resulting model or null
- */
-Location.findByEventId = function(id) {
-        return Location.where({ event_id: id}).fetch();
-};
+// /**
+//  * Finds a Location by its event ID.
+//  * @param  {Number|String} id   the ID of the model with the appropriate type
+//  * @return {Promise<Model>}             a Promise resolving to the resulting model or null
+//  */
+// Location.findByEventId = function(id) {
+//         return Location.where({ event_id: id}).fetch();
+// };
 
 module.exports = Location;
