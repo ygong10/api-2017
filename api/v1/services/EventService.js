@@ -116,8 +116,8 @@ module.exports.findByUpdated = function (unix_timestamp) {
                 });
 };
 
-module.exports.createLocation = function (name, short_name, latitude, longitude) {
-        return Location.addLocation(name, short_name, latitude, longitude)
+module.exports.createLocation = function (id, name, short_name, latitude, longitude) {
+        return Location.addLocation(id, name, short_name, latitude, longitude)
                 .then(function (result) {
                         return result.save();
                 });

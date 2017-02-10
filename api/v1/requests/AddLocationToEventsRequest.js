@@ -2,7 +2,7 @@ var Request = require('./Request');
 
 var bodyRequired = ['eventIds', 'locationId'];
 var bodyValidations = {
-        'eventIds'     : ['array'],
+        'eventIds'     : ['array', 'minLength:1'],
         'locationId'   : ['number']
 };
 
