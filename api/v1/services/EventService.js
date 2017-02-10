@@ -5,7 +5,7 @@ var moment = require('moment');
 
 var Event = require('../models/Event');
 var Location = require('../models/Location');
-var Location_Events = require('../models/Location_Events');
+var LocationEvents = require('../models/LocationEvents');
 
 var errors = require('../errors');
 var utils = require('../utils');
@@ -18,38 +18,52 @@ var utils = require('../utils');
  * @param  {Number|Boolean} qr_code         Whether the event needs a QR code or not
  * @param  {Number}         start_time      Time at which the event starts
  * @param  {Number}         end_time        Time at which the event ends
- * @param  {[Location]}     locations       Array of Location objects. Containing three parameters:
+ * @param  {String}         eventTag        Array of Location objects, or id referencing them.
+ * @param  {[Object]}       locations       Array of Location objects, or id referencing them.
+ *                                          Location object containing three parameters:
  *                                              name:      name of the location,
  *                                              latitude:  latitude of the location,
  *                                              longitude: longitude of the location
+ *                                          Otherwise, we expect just an id.
  */
 module.exports.createEvent = function (name, short_name,
                                        description, qr_code,
-                                       start_time, end_time, locations) {
+                                       start_time, end_time,
+                                       tag, locations) {
         var event_obj = null;
         return Event.create(name, short_name,
                             description, qr_code,
-                            start_time, end_time, locations)
+                            start_time, end_time, tag, locations)
                 .then(function(result) {
                         event_obj = result;
                         return _Promise.map(locations, function(location) {
-                                return Location.addLocation(location.name,
-                                                            location.short_name,
+                                return Location.addLocation(location.id,
+                                                            location.name,
+                                                            location.shortName,
                                                             location.latitude,
                                                             location.longitude);
                         });
                 })
                 .then(function (result) {
                         event_obj.attributes.locations = result;
-                        return Location_Events.addRecordModels(result || [], [event_obj]);
+                        return LocationEvents.addRecordModels(result || [], [event_obj]);
                 })
                 .then(function (result) {
                         return event_obj;
                 });
 };
 
+function appendEvent(location) {
+        return LocationEvents.getEventsFromLocationId(location.getEvents('id'))
+                .then(function(result) {
+                        return _Promise.map(result.models, function(mapModel) {
+                                return Event.findById(mapModel.get('eventId'));
+                        });
+                });
+}
+
 function appendLocation(event) {
-        return Location_Events.getLocationsFromEventId(event.get('id'))
+        return LocationEvents.getLocationsFromEventId(event.get('id'))
                 .then(function (result) {
                         return _Promise.map(result.models, function(mapModel) {
                                 return Location.findById(mapModel.get('locationId'));
@@ -61,8 +75,38 @@ function appendLocation(event) {
                 });
 }
 
+/**
+ * Find event and corresponding locations.
+ */
+module.exports.findEventById = function (id) {
+        return Event.findById(id)
+                .then(function (result) {
+                        if (_.isNull(result)) {
+                                var message = "The Event with the given ID could not be found.";
+                                var source = "id";
+                                throw new errors.NotFoundError(message, id);
+                        }
+
+                        result.attributes.locations = [];
+                        return appendLocation(result);
+                });
+};
+
+module.exports.findLocationById = function(id) {
+        return Location.findById(id)
+                .then(function (result) {
+                        if (_.isNull(result)) {
+                                var message = "The Event with the given ID could not be found.";
+                                var source = "id";
+                                throw new errors.NotFoundError(message, id);
+                        }
+
+                        result.attributes.events = [];
+                        return appendEvent(result);
+                });
+};
+
 module.exports.findByUpdated = function (unix_timestamp) {
-        console.log(unix_timestamp);
         return Event.findByUpdated(unix_timestamp)
                 .then(function (events) {
                         return _Promise.map(events.models, function(event) {
@@ -84,19 +128,26 @@ module.exports.getLocations = function () {
 };
 
 module.exports.addLocationToEvents = function (event_ids, location_id) {
-        return Location_Events.addRecords([location_id], event_ids)
-                .then(function (result) {
-                        return _Promise.map(event_ids, function (event_id) {
-                                return Event.where({ id: event_id }).fetch();
-                        });
+        return LocationEvents.addRecords([location_id], event_ids)
+                .catch(function(err) {
+                        return _Promise.reject(err);
                 });
 };
 
 module.exports.addEventToLocations = function (event_id, location_ids) {
-        return Location_Event.addRecords([event_id], location_ids)
+        return LocationEvents.addRecords(location_ids, [event_id])
+                .catch(function(err) {
+                        return _Promise.reject(err);
+                });
+};
+
+module.exports.deleteReference = function(event_ids, location_ids) {
+        return LocationEvents.deleteEventReference(event_ids, location_ids);
+};
+
+module.exports.deleteEvents = function(event_id) {
+        return LocationEvents.deleteEventReference([event_id])
                 .then(function (result) {
-                        return _Promise.map(location_ids, function (location_id) {
-                                return Location.where({ id: location_id }).fetch();
-                        });
+                        return Event.where({ id: event_id }).destroy();
                 });
 };

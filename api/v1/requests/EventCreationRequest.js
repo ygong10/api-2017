@@ -1,25 +1,28 @@
 var Request = require('./Request');
+var eventTags = require('../utils/eventTags');
 
-var bodyRequired = ['name', 'short_name', 'qr_code',
-		    'description', 'start_time', 'end_time'];
+var bodyRequired = ['name', 'shortName', 'qrCode',
+                    'description', 'startTime',
+                    'endTime'];
 
 var bodyValidations = {
-	'short_name'    : ['string', 'maxLength:25'],
-        'name'		: ['string', 'maxLength:255'],
-        'qr_code'	: ['natural'],
-        'description'	: ['string', 'maxLength:2047'],
-        'start_time'    : ['number'],
-        'end_time'      : ['number']
+        'shortName'   : ['string', 'maxLength:25'],
+        'name'        : ['string', 'maxLength:255'],
+        'qrCode'      : ['natural'],
+        'description' : ['string', 'maxLength:2047'],
+        'startTime'   : ['number'],
+        'endTime'     : ['number'],
+        'tag'         : ['string', eventTags.verifyTags]
 };
 
-var bodyAllowed = ['locations'];
+var bodyAllowed = ['locations', 'tag'];
 
 function EventCreationRequest(headers, body) {
         Request.call(this, headers, body);
 
         this.bodyRequired = bodyRequired;
         this.bodyValidations = bodyValidations;
-	this.bodyAllowed = bodyAllowed;
+        this.bodyAllowed = bodyAllowed;
 }
 
 EventCreationRequest.prototype = Object.create(Request.prototype);

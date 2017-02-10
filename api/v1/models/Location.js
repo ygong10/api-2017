@@ -2,44 +2,60 @@
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
+var errors = require('../errors');
+
 var Model = require('./Model');
-var Location_Events = require('./Location_Events');
+var LocationEvents = require('./LocationEvents');
 
 var Location = Model.extend({
         tableName: 'locations',
         idAttribute: 'id',
         validations: {
                 name: ['required', 'string', 'maxLength:255'],
-                short_name: ['required', 'string', 'maxLength:25'],
+                shortName: ['required', 'string', 'maxLength:25'],
                 latitude: ['required', 'number'],
                 longitude: ['required', 'number']
         },
 
-        location_events: function () {
-                return this.belongsToMany(Location_Events);
+        locationEvents: function () {
+                return this.belongsToMany(LocationEvents);
         }
 });
 
 /**
  * Adds locations to the specified event. If the role already exists, it is returned
  * unmodified
+ * @param  {id}          id          Event id. If undefined, the event will be created
  * @param  {Event}       event       Event Object to add the event to
  * @param  {[Location]}  locations   Array of Location objects. Containing three parameters:
- name:      name of the location,
- latitude:  latitude of the location,
- longitude: longitude of the location,
- * @param {Transaction} t       pending transaction (optional)
+ *                                            name:      name of the location,
+ *                                            latitude:  latitude of the location,
+ *                                            longitude: longitude of the location,
+ * @throws NotFoundError             When and id that is not found is requested.
  * @returns {Promise<Location>} the result of the addititon
  */
-Location.addLocation = function(name, short_name, latitude, longitude) {
+Location.addLocation = function(id, name, short_name, latitude, longitude) {
+        if (id) {
+                return Location.where({ id: id }).fetch()
+                        .then(function(result) {
+                                if (_.isNull(result)) {
+                                        var message = "Location with the specified id "+id+" cannot be found";
+                                        var source = "id";
+                                        throw new errors.NotFoundError(message, source);
+                                }
+
+                                return result;
+                        });
+        }
+
         var location = Location.forge({
                 name: name,
-		short_name: short_name,
+                shortName: short_name,
                 latitude: latitude,
                 longitude: longitude
         });
 
-	return location.save();
+        return location.save();
 };
 
 /**
@@ -50,14 +66,5 @@ Location.addLocation = function(name, short_name, latitude, longitude) {
 Location.findById = function(id) {
         return Location.where({ id: id }).fetch();
 };
-
-// /**
-//  * Finds a Location by its event ID.
-//  * @param  {Number|String} id   the ID of the model with the appropriate type
-//  * @return {Promise<Model>}             a Promise resolving to the resulting model or null
-//  */
-// Location.findByEventId = function(id) {
-//         return Location.where({ event_id: id}).fetch();
-// };
 
 module.exports = Location;

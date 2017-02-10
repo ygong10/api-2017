@@ -1,9 +1,9 @@
 var Request = require('./Request');
 
-var bodyRequired = ['event_ids', 'location_id'];
+var bodyRequired = ['eventIds', 'locationId'];
 var bodyValidations = {
-        'event_ids'     : ['array'],
-        'location_id'   : ['number']
+        'eventIds'     : ['array'],
+        'locationId'   : ['number']
 };
 
 function AddLocationToEventsRequest(headers, body) {

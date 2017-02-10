@@ -4,7 +4,9 @@ var _ = require('lodash');
 var moment = require('moment');
 
 var Model = require('./Model');
-var Location_Events = require('./Location_Events');
+var LocationEvents = require('./LocationEvents');
+
+var eventTags = require('../utils/eventTags.js');
 
 var Event = Model.extend({
         tableName: 'events',
@@ -12,15 +14,16 @@ var Event = Model.extend({
         hasTimestamps: ['created', 'updated'],
         validations: {
                 name: ['required', 'string', 'maxLength:255'],
-                short_name: ['required', 'string', 'maxLength:25'],
+                shortName: ['required', 'string', 'maxLength:25'],
                 description: ['required', 'string', 'maxLength:2047'],
-                qr_code: ['required', 'boolean'],
-                start_time: ['required', 'date'],
-                end_time: ['required', 'date']
+                qrCode: ['required', 'boolean'],
+                startTime: ['required', 'date'],
+                endTime: ['required', 'date'],
+                tag: ['required', 'string', eventTags.verifyTags]
         },
 
-        location_events: function () {
-                return this.belongsToMany(Location_Events);
+        locationEvents: function () {
+                return this.belongsToMany(LocationEvents);
         }
 });
 
@@ -30,7 +33,7 @@ var Event = Model.extend({
  * @return {Promise<Model>}     a Promise resolving to the resulting model or null
  */
 Event.findById = function(id) {
-        return Event.where({ id: id });
+        return Event.where({ id: id }).fetch();
 };
 
 
@@ -52,6 +55,7 @@ Event.findByUpdated = function(unix_timestamp) {
  * @param  {Number|Boolean} qr_code         Whether the event needs a QR code or not
  * @param  {Number}         start_time      Time at which the event takes place
  * @param  {Number}         end_time            Time at which the event takes place
+ * @param  {String}         tag            Time at which the event takes place
  * @param  {[Location]}     locations       Array of Location objects. Containing three parameters:
  *                                                   name:      name of the location,
  *                                                   latitude:  latitude of the location,
@@ -59,14 +63,16 @@ Event.findByUpdated = function(unix_timestamp) {
  */
 Event.create = function (name, short_name,
 			 description, qr_code,
-			 start_time, end_time, locations) {
+			 start_time, end_time, tag, locations) {
+        // TODO: Check for duplicates
         var event = Event.forge({
                 name: name,
-		short_name: short_name,
+		shortName: short_name,
                 description: description,
-                qr_code: qr_code != 0,
-		start_time: moment.unix(start_time).toDate(),
-		end_time: moment.unix(end_time).toDate()
+                qrCode: qr_code != 0,
+		startTime: moment.unix(start_time).toDate(),
+		endTime: moment.unix(end_time).toDate(),
+                tag: tag
         });
 
         if (!locations || locations.length == 0) {
@@ -78,8 +84,8 @@ Event.create = function (name, short_name,
 
 Event.prototype.serialize = function () {
         var ret = _.omit(this.attributes, ['created']);
-	ret.start_time	= ret.startTime.getTime() / 1000.0;
-	ret.end_time	= ret.endTime.getTime() / 1000.0;
+	ret.startTime	= ret.startTime.getTime() / 1000.0;
+	ret.endTime	= ret.endTime.getTime() / 1000.0;
 	ret.updated	= ret.updated.getTime() / 1000.0;
 	return ret;
 };

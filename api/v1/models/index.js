@@ -8,6 +8,7 @@ module.exports = {
 	Ecosystem: require('./Ecosystem'),
 	Event: require('./Event'),
 	Location: require('./Location'),
+	LocataionEvents: rquire('./LocationEvents'),
 	MailingList: require('./MailingList'),
 	MailingListUser: require('./MailingListUser'),
 	User: require('./User'),

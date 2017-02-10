@@ -4,4 +4,5 @@ CREATE TABLE `location-events` (
    `location_id` INT UNSIGNED NOT NULL,
    PRIMARY KEY (`id`),
    FOREIGN KEY (`event_id`) REFERENCES `events` (`id`),
-   FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`))
+   FOREIGN KEY (`location_id`) REFERENCES `locations` (`id`),
+   UNIQUE KEY (`event_id`, `location_id`))
