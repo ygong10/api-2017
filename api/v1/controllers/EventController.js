@@ -19,6 +19,10 @@ function getEvents(req, res, next) {
                         });
                         next();
                         return null;
+                })
+                .catch(function(err) {
+                        next(err);
+                        return null;
                 });
 }
 
@@ -29,6 +33,10 @@ function createEvent(req, res, next) {
                 .then(function(result) {
                         res.body = result.toJSON();
                         next();
+                        return null;
+                })
+                .catch(function(err) {
+                        next(err);
                         return null;
                 });
 }
@@ -43,6 +51,10 @@ function createLocation(req, res, next) {
                         res.body = result.length == 0 ? [] : result.toJSON();
                         next();
                         return null;
+                })
+                .catch(function(err) {
+                        next(err);
+                        return null;
                 });
 }
 
@@ -51,6 +63,10 @@ function getLocations(req, res, next) {
                 .then(function (result) {
                         res.body = result.length == 0 ? [] : result.toJSON();
                         next();
+                        return null;
+                })
+                .catch(function(err) {
+                        next(err);
                         return null;
                 });
 }
@@ -97,6 +113,10 @@ function deleteReference(req, res, next) {
                 .then(function (result) {
                         next();
                         return null;
+                })
+                .catch(function(err) {
+                        next(err);
+                        return null;
                 });
 }
 
@@ -104,6 +124,10 @@ function deleteEvent(req, res, next) {
         return services.EventService.deleteEvent(req.body.eventId)
                 .then(function (result) {
                         next();
+                        return null;
+                })
+                .catch(function(err) {
+                        next(err);
                         return null;
                 });
 }

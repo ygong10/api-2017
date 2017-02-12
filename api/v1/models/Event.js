@@ -27,14 +27,14 @@ var Event = Model.extend({
         }
 });
 
-/**
- * Finds a event by its ID, joining in its related roles
- * @param  {Number|String} id   the ID of the model with the appropriate type
- * @return {Promise<Model>}     a Promise resolving to the resulting model or null
- */
-Event.findById = function(id) {
-        return Event.where({ id: id }).fetch();
-};
+// /**
+//  * Finds a event by its ID, joining in its related roles
+//  * @param  {Number|String} id   the ID of the model with the appropriate type
+//  * @return {Promise<Model>}     a Promise resolving to the resulting model or null
+//  */
+// Event.findById = function(id) {
+//         return Event.where({ id: id }).fetch();
+// };
 
 
 /**

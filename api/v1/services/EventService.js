@@ -17,6 +17,7 @@ var utils = require('../utils');
  */
 module.exports.createEvent = function (event) {
         var event_obj = null;
+        var location_objs = null;
         return Event.create(event)
                 .then(function(result) {
                         event_obj = result;
@@ -25,6 +26,9 @@ module.exports.createEvent = function (event) {
                         });
                 })
                 .then(function (result) {
+                        for (var i = 0; i < result.length; i++) {
+                                result.validate();
+                        }
                         event_obj.attributes.locations = result;
                         return LocationEvents.addRecordModels(result || [], [event_obj]);
                 })

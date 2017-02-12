@@ -1,6 +1,5 @@
 /* jshint version 8 */
 var _Promise = require('bluebird');
-var bcrypt = _Promise.promisifyAll(require('bcrypt'));
 var _ = require('lodash');
 
 var Model = require('./Model');

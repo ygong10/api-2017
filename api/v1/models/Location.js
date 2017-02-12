@@ -54,7 +54,7 @@ Location.addLocation = function(location) {
                 shortName: location.shortName,
                 latitude: location.latitude,
                 longitude: location.longitude
-        }).save();
+        });
 
 };
 
