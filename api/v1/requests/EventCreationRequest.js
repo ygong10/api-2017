@@ -10,8 +10,8 @@ var bodyValidations = {
         'name'        : ['string', 'maxLength:255'],
         'qrCode'      : ['natural'],
         'description' : ['string', 'maxLength:2047'],
-        'startTime'   : ['number'],
-        'endTime'     : ['number'],
+        'startTime'   : ['string'],
+        'endTime'     : ['string'],
         'tag'         : ['string', eventTags.verifyTags]
 };
 

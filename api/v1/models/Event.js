@@ -57,8 +57,8 @@ Event.create = function (event_req) {
 		shortName: event_req.shortName,
                 description: event_req.description,
                 tracking: event_req.tracking != 0,
-		startTime: event_req.startTime,
-		endTime: event_req.endTime,
+		startTime: new Date(event_req.startTime),
+		endTime: new Date(event_req.endTime),
                 tag: event_req.tag
         });
 
