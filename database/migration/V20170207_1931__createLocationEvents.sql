@@ -1,4 +1,4 @@
-CREATE TABLE `location-events` (
+CREATE TABLE `location_events` (
    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
    `event_id` INT UNSIGNED NOT NULL,
    `location_id` INT UNSIGNED NOT NULL,

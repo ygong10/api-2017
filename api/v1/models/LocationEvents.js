@@ -7,7 +7,7 @@ var Model = require('./Model');
 var errors = require('../errors');
 
 var LocationEvents = Model.extend({
-        tableName: 'location-events',
+        tableName: 'location_events',
         idAttribute: 'id',
         validations: {
                 eventId: ['required', 'natural'],
@@ -64,12 +64,13 @@ LocationEvents.addRecords = function (locations, events) {
                 return _Promise.map(records, function(model) {
                         return LocationEvents.forge(model).save(null, {transacting: t});
                 });
-        }).catch(errors.SqlError.checkError, function(err) {
-                var message = "Bad SQL Error. " ;
-                message +=  "Either there are duplicates, or requested id does not exist ";
-                message +=  "(" + err.code + ")";
-                return _Promise.reject(new errors.SqlError(message, err.code));
-        });
+        })
+                .catch(errors.SqlError.checkError, function(err) {
+                        var message = "Bad SQL Error. " ;
+                        message +=  "Either there are duplicates, or requested id does not exist ";
+                        message +=  "(" + err.code + ")";
+                        return _Promise.reject(new errors.SqlError(message, err.code));
+                });
 };
 
 LocationEvents.addRecordModels = function (locations, events) {

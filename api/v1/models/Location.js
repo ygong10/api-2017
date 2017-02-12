@@ -27,19 +27,20 @@ var Location = Model.extend({
  * unmodified
  * @param  {id}          id          Event id. If undefined, the event will be created
  * @param  {Event}       event       Event Object to add the event to
- * @param  {[Location]}  locations   Array of Location objects. Containing three parameters:
+ * @param  {Location}    location    Location object. Containing three parameters:
  *                                            name:      name of the location,
  *                                            latitude:  latitude of the location,
  *                                            longitude: longitude of the location,
  * @throws NotFoundError             When and id that is not found is requested.
  * @returns {Promise<Location>} the result of the addititon
  */
-Location.addLocation = function(id, name, short_name, latitude, longitude) {
-        if (id) {
-                return Location.where({ id: id }).fetch()
+Location.addLocation = function(location) {
+        if (location.id) {
+                return Location.findById(location.id)
                         .then(function(result) {
                                 if (_.isNull(result)) {
-                                        var message = "Location with the specified id "+id+" cannot be found";
+                                        var message = "Location with the specified id " +
+                                            location.id + " cannot be found";
                                         var source = "id";
                                         throw new errors.NotFoundError(message, source);
                                 }
@@ -48,14 +49,13 @@ Location.addLocation = function(id, name, short_name, latitude, longitude) {
                         });
         }
 
-        var location = Location.forge({
-                name: name,
-                shortName: short_name,
-                latitude: latitude,
-                longitude: longitude
-        });
+        return Location.forge({
+                name: location.name,
+                shortName: location.shortName,
+                latitude: location.latitude,
+                longitude: location.longitude
+        }).save();
 
-        return location.save();
 };
 
 /**

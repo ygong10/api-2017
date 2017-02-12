@@ -16,7 +16,7 @@ var Event = Model.extend({
                 name: ['required', 'string', 'maxLength:255'],
                 shortName: ['required', 'string', 'maxLength:25'],
                 description: ['required', 'string', 'maxLength:2047'],
-                qrCode: ['required', 'boolean'],
+                tracking: ['required', 'boolean'],
                 startTime: ['required', 'date'],
                 endTime: ['required', 'date'],
                 tag: ['required', 'string', eventTags.verifyTags]
@@ -39,55 +39,30 @@ Event.findById = function(id) {
 
 /**
  * Finds all events that have been updated since the given timestamp.
- * @param {Number} unix_timestamp     the timestamp to fetch from
+ * @param {Date}        dateObj       the timestamp to fetch from
  * @return {Promise<Model>}           a Promise resolving to models since the timestamps
  */
-Event.findByUpdated = function(unix_timestamp) {
-        return Event.where('updated', '>=', moment.unix(unix_timestamp).toDate())
+Event.findByUpdated = function(dateObj) {
+        return Event.where('updated', '>=', dateObj)
 		.fetchAll();
 };
 
 /**
  * Creates a new event and locations with the specified parameters. Validation is performed on-save only
- * @param  {String}         name            The event's name
- * @param  {String}         short_name            The event's name
- * @param  {String}         description     The event's description
- * @param  {Number|Boolean} qr_code         Whether the event needs a QR code or not
- * @param  {Number}         start_time      Time at which the event takes place
- * @param  {Number}         end_time            Time at which the event takes place
- * @param  {String}         tag            Time at which the event takes place
- * @param  {[Location]}     locations       Array of Location objects. Containing three parameters:
- *                                                   name:      name of the location,
- *                                                   latitude:  latitude of the location,
- *                                                   longitude: longitude of the location,
+ * @param {event_req} Event request parameter.
  */
-Event.create = function (name, short_name,
-			 description, qr_code,
-			 start_time, end_time, tag, locations) {
-        // TODO: Check for duplicates
+Event.create = function (event_req) {
         var event = Event.forge({
-                name: name,
-		shortName: short_name,
-                description: description,
-                qrCode: qr_code != 0,
-		startTime: moment.unix(start_time).toDate(),
-		endTime: moment.unix(end_time).toDate(),
-                tag: tag
+                name: event_req.name,
+		shortName: event_req.shortName,
+                description: event_req.description,
+                tracking: event_req.tracking != 0,
+		startTime: event_req.startTime,
+		endTime: event_req.endTime,
+                tag: event_req.tag
         });
 
-        if (!locations || locations.length == 0) {
-                return event.save();
-        }
-
         return event.save();
-};
-
-Event.prototype.serialize = function () {
-        var ret = _.omit(this.attributes, ['created']);
-	ret.startTime	= ret.startTime.getTime() / 1000.0;
-	ret.endTime	= ret.endTime.getTime() / 1000.0;
-	ret.updated	= ret.updated.getTime() / 1000.0;
-	return ret;
 };
 
 module.exports = Event;

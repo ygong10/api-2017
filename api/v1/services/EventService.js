@@ -12,36 +12,16 @@ var utils = require('../utils');
 
 /**
  * Creates a new event and locations with the specified parameters. Validation is performed on-save only
- * @param  {String}         name            The event's name
- * @param  {String}         short_name            The event's name
- * @param  {String}         description     The event's description
- * @param  {Number|Boolean} qr_code         Whether the event needs a QR code or not
- * @param  {Number}         start_time      Time at which the event starts
- * @param  {Number}         end_time        Time at which the event ends
- * @param  {String}         eventTag        Array of Location objects, or id referencing them.
- * @param  {[Object]}       locations       Array of Location objects, or id referencing them.
- *                                          Location object containing three parameters:
- *                                              name:      name of the location,
- *                                              latitude:  latitude of the location,
- *                                              longitude: longitude of the location
- *                                          Otherwise, we expect just an id.
+ * @param  {Event}          event           An Event object, with locations having an array of
+ *                                          location objects or an `id` with an existing location.
  */
-module.exports.createEvent = function (name, short_name,
-                                       description, qr_code,
-                                       start_time, end_time,
-                                       tag, locations) {
+module.exports.createEvent = function (event) {
         var event_obj = null;
-        return Event.create(name, short_name,
-                            description, qr_code,
-                            start_time, end_time, tag, locations)
+        return Event.create(event)
                 .then(function(result) {
                         event_obj = result;
-                        return _Promise.map(locations, function(location) {
-                                return Location.addLocation(location.id,
-                                                            location.name,
-                                                            location.shortName,
-                                                            location.latitude,
-                                                            location.longitude);
+                        return _Promise.map(event.locations, function(location) {
+                                return Location.addLocation(location);
                         });
                 })
                 .then(function (result) {

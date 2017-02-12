@@ -1,19 +1,14 @@
 var bodyParser = require('body-parser');
 var _Promise = require('bluebird');
-
-var errors = require('../errors');
-var services = require('../services');
 var config = require('../../config');
-
+var errors = require('../errors');
+var logger = require('../../logging');
 var middleware = require('../middleware');
+var services = require('../services');
 var requests = require('../requests');
+var router = require('express').Router();
 var utils = require('../utils');
 
-var EventService = require('../services/EventService');
-
-var logger = require('../../logging');
-
-var router = require('express').Router();
 
 function getEvents(req, res, next) {
         var updated = req.query.lastUpdated || 0;
@@ -28,14 +23,9 @@ function getEvents(req, res, next) {
 }
 
 function createEvent(req, res, next) {
-        return services.EventService.createEvent(req.body.name,
-                                                 req.body.shortName,
-                                                 req.body.description,
-                                                 req.body.qrCode,
-                                                 req.body.startTime,
-                                                 req.body.endTime,
-                                                 req.body.tag || "SCHEDULE",
-                                                 req.body.locations || [])
+        req.body.tag = req.body.tag || "SCHEDULE";
+        req.body.locations = req.body.locations || [];
+        return services.EventService.createEvent(req.body)
                 .then(function(result) {
                         res.body = result.toJSON();
                         next();
