@@ -10,13 +10,11 @@ var router = require('express').Router();
 var utils = require('../utils');
 
 
-function getEvents(req, res, next) {
+function getAllEvents(req, res, next) {
         var updated = req.query.lastUpdated || 0;
         return services.EventService.findByUpdated(updated)
                 .then(function(result) {
-                        res.body = result.length == 0 ? [] : result.map(function (obj) {
-                                return obj.toJSON();
-                        });
+                        res.body = result.toJSON();
                         next();
                         return null;
                 })
@@ -101,53 +99,14 @@ function addEventToLocations(req, res, next) {
                 });
 }
 
-function deleteReference(req, res, next) {
-        if (!req.body.eventIds && !req.body.locationIds)
-        {
-                var message = "Either eventIds or locationIds must be non-null";
-                var source = "eventIds and locationIds";
-                next(new errors.InvalidParameterError(message, source));
-                return null;
-        }
-        return services.EventService.deleteReference(req.body.eventIds, req.body.locationIds)
-                .then(function (result) {
-                        next();
-                        return null;
-                })
-                .catch(function(err) {
-                        next(err);
-                        return null;
-                });
-}
-
-function deleteEvent(req, res, next) {
-        return services.EventService.deleteEvent(req.body.eventId)
-                .then(function (result) {
-                        next();
-                        return null;
-                })
-                .catch(function(err) {
-                        next(err);
-                        return null;
-                });
-}
-
 router.use(bodyParser.json());
 
-router.get('/', getEvents);
+router.get('/', getAllEvents);
 router.get('/locations', getLocations);
 router.post('/create', middleware.auth,
             middleware.permission(utils.roles.ORGANIZERS), // Change to SUPERUSER?
             middleware.request(requests.EventCreationRequest),
             createEvent);
-router.post('/delete', middleware.auth,
-            middleware.permission(utils.roles.ORGANIZERS),
-            middleware.request(requests.DeleteEventRequest),
-            deleteEvent);
-router.post('/deleteReference', middleware.auth,
-            middleware.permission(utils.roles.ORGANIZERS),
-            middleware.request(requests.DeleteReferenceRequest),
-            deleteReference);
 router.post('/locations', middleware.auth,
             middleware.permission(utils.roles.ORGANIZERS), // Change to SUPERUSER?
             middleware.request(requests.LocationCreationRequest),

@@ -1,4 +1,3 @@
-/* jshint version 8 */
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
@@ -13,39 +12,6 @@ var LocationEvents = Model.extend({
                 locationId: ['required', 'natural']
         }
 });
-
-LocationEvents.deleteEventReference = function(events, locations) {
-        if (!events && !locations) {
-                return null;
-        }
-
-        if (!events || events.length == 0) {
-                return _Promise.map(locations, function (location) {
-                        return LocationEvents.where({ location_id: location }).destroy();
-                });
-        }
-
-        if (!locations || locations.length == 0) {
-                return _Promise.map(events, function (event) {
-                        return LocationEvents.where({ event_id: event }).destroy();
-                });
-        }
-
-        var records = new Array(locations.length*events.length);
-
-        for (var i = 0; i < locations.length; i++) {
-                for (var j = 0; j < events.length; j++) {
-                        records[i*events.length+j] = {
-                                event_id: events[j],
-                                location_id: locations[i]
-                        };
-                }
-        }
-
-        return _Promise.map(records, function(record) {
-                LocationEvents.where(record).destroy();
-        });
-};
 
 LocationEvents.addRecords = function (locations, events) {
         var records = new Array(locations.length*events.length);

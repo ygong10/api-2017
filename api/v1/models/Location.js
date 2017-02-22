@@ -1,4 +1,3 @@
-/* jshint esversion 6 */
 var _Promise = require('bluebird');
 var _ = require('lodash');
 
@@ -56,15 +55,6 @@ Location.addLocation = function(location) {
                 longitude: location.longitude
         });
 
-};
-
-/**
- * Finds a location by its ID.
- * @param  {Number|String} id   the ID of the model with the appropriate type
- * @return {Promise<Model>}             a Promise resolving to the resulting model or null
- */
-Location.findById = function(id) {
-        return Location.where({ id: id }).fetch();
 };
 
 module.exports = Location;

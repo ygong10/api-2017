@@ -6,16 +6,16 @@ _.forEach(ALL_TAGS, function (tag) {
 	module.exports[tag] = tag;
 });
 
-
 /**
  * Determines whether or not a given tag is in a certain tag group
  * @param  {Array}  group  a group of tags
  * @param  {String}  tag   a tag to verify
- * @return {Boolean}       whether or not the tag is in the given group
+ * @return {Boolean} whether or not the tag is in the given group
  */
 module.exports.isIn = function (group, tag) {
 	return _.includes(group, tag);
-}
+};
+
 /**
  * Ensures that the provided tag is in ALL_TAGS
  * @param  {String} role the value to check

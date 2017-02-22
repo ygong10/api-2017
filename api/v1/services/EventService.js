@@ -124,14 +124,3 @@ module.exports.addEventToLocations = function (event_id, location_ids) {
                         return _Promise.reject(err);
                 });
 };
-
-module.exports.deleteReference = function(event_ids, location_ids) {
-        return LocationEvents.deleteEventReference(event_ids, location_ids);
-};
-
-module.exports.deleteEvents = function(event_id) {
-        return LocationEvents.deleteEventReference([event_id])
-                .then(function (result) {
-                        return Event.where({ id: event_id }).destroy();
-                });
-};
