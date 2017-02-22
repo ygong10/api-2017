@@ -46,7 +46,7 @@ function createLocation(req, res, next) {
                                                     req.body.latitude,
                                                     req.body.longitude)
                 .then(function (result) {
-                        res.body = result.length == 0 ? [] : result.toJSON();
+                        res.body = result.toJSON();
                         next();
                         return null;
                 })
@@ -59,7 +59,7 @@ function createLocation(req, res, next) {
 function getLocations(req, res, next) {
         return services.EventService.getLocations()
                 .then(function (result) {
-                        res.body = result.length == 0 ? [] : result.toJSON();
+                        res.body = result.toJSON();
                         next();
                         return null;
                 })
@@ -70,8 +70,7 @@ function getLocations(req, res, next) {
 }
 
 function addLocationToEvents(req, res, next) {
-        return services.EventService.addLocationToEvents(req.body.eventIds,
-                                                         req.body.locationId)
+        return services.EventService.addLocationToEvents(req.body.eventIds, req.body.locationId)
                 .then(function (event) {
                         next();
                         return null;
@@ -83,8 +82,7 @@ function addLocationToEvents(req, res, next) {
 }
 
 function addEventToLocations(req, res, next) {
-        return services.EventService.addEventToLocations(req.body.eventId,
-                                                         req.body.locationIds)
+        return services.EventService.addEventToLocations(req.body.eventId, req.body.locationIds)
                 .then(function (result) {
                         return services.EventService.findEventById(req.body.eventId);
                 })
@@ -103,25 +101,24 @@ router.use(bodyParser.json());
 
 router.get('/', getAllEvents);
 router.get('/locations', getLocations);
-router.post('/create', middleware.auth,
-            middleware.permission(utils.roles.ORGANIZERS), // Change to SUPERUSER?
+router.post('/', middleware.auth,
+            middleware.permission(utils.roles.ORGANIZERS),
             middleware.request(requests.EventCreationRequest),
             createEvent);
-router.post('/locations', middleware.auth,
-            middleware.permission(utils.roles.ORGANIZERS), // Change to SUPERUSER?
+router.post('/location', middleware.auth,
+            middleware.permission(utils.roles.ORGANIZERS),
             middleware.request(requests.LocationCreationRequest),
             createLocation);
 router.post('/addLocation', middleware.auth,
-            middleware.permission(utils.roles.ORGANIZERS), // Change to SUPERUSER?
+            middleware.permission(utils.roles.ORGANIZERS),
             middleware.request(requests.AddEventToLocationsRequest), 
             addEventToLocations);
 router.post('/locations/addEvent', middleware.auth,
-            middleware.permission(utils.roles.ORGANIZERS), // Change to SUPERUSER?
+            middleware.permission(utils.roles.ORGANIZERS),
             middleware.request(requests.addLocationToEvents),
             addLocationToEvents);
 
 router.use(middleware.response);
 router.use(middleware.errors);
 
-module.exports.getEvents = getEvents;
 module.exports.router = router;
