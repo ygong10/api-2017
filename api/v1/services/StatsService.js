@@ -67,7 +67,7 @@ function _populateAttendingEcosystems(cb){
         .whereExists(function() {
             this.select('*').from('attendees').whereRaw('attendees.id = aei.attendee_id').andWhere('status', 'ACCEPTED')
             .whereExists(function() {
-                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1);
+                this.select('*').from('attendee_rsvps').whereRaw('attendees.id = attendee_rsvps.attendee_id').andWhere('is_attending', 1).andWhere('type', 'CONTRIBUTE');
             });
         }).groupBy('aei.ecosystem_id');
     })
