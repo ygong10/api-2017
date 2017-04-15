@@ -1,6 +1,6 @@
 var config = require('./config');
 var logger = require('./logging');
-
+hi
 var _Promise = require('bluebird');
 var redis = require('redis');
 
